@@ -21,7 +21,7 @@ export const authHandlers = [
     const user = mockUsers.find((u) => u.email === body.email);
     const storedPassword = userPasswords.get(body.email);
 
-    await delay(2000)
+    await delay(2000);
 
     if (!user || !storedPassword || storedPassword !== body.password) {
       return HttpResponse.json(
@@ -29,7 +29,7 @@ export const authHandlers = [
           message: "Неверный email или пароль",
           code: "INVALID_CREDENTIALS",
         },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -39,12 +39,14 @@ export const authHandlers = [
         accessToken: token,
         user,
       },
-      { status: 200 },
+      { status: 200 }
     );
   }),
 
   http.post("/auth/register", async ({ request }) => {
     const body = (await request.json()) as ApiSchemas["RegisterRequest"];
+
+    await delay(2000);
 
     if (mockUsers.some((u) => u.email === body.email)) {
       return HttpResponse.json(
@@ -52,7 +54,7 @@ export const authHandlers = [
           message: "Пользователь уже существует",
           code: "USER_EXISTS",
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -71,7 +73,7 @@ export const authHandlers = [
         accessToken: token,
         user: newUser,
       },
-      { status: 201 },
+      { status: 201 }
     );
   }),
 ];

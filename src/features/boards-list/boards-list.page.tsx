@@ -33,6 +33,7 @@ const BoardsList = () => {
           </CardHeader>
           <CardFooter>
             <Button
+              variant={"destructive"}
               disabled={deleteBoardMutation.isPending}
               onClick={() =>
                 deleteBoardMutation.mutate({
