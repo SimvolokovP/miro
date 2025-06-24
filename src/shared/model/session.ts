@@ -35,9 +35,7 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     set({ token: null, session: null });
   },
   refreshToken: async () => {
-    const token = get().token;
-    const login = get().login;
-    const logout = get().logout;
+    const { token, login, logout } = get();
 
     if (!token) {
       return null;
@@ -46,31 +44,35 @@ export const useSessionStore = create<SessionStore>((set, get) => ({
     const session = jwtDecode<Session>(token);
 
     if (session.exp < Date.now() / 1000) {
-      if (!refreshTokenPromise) {
-        refreshTokenPromise = publicFetchClient
-          .POST("/auth/refresh")
-          .then((r) => r.data?.accessToken ?? null)
-          .then((newToken) => {
-            if (newToken) {
-              login(newToken);
-              return newToken;
-            } else {
-              logout();
-              return null;
-            }
-          })
-          .finally(() => {
-            refreshTokenPromise = null;
-          });
+      console.log(session);
+
+      if (refreshTokenPromise) {
+        return refreshTokenPromise;
       }
 
-      const newToken = await refreshTokenPromise;
+      refreshTokenPromise = publicFetchClient
+        //@ts-ignore
+        .POST("/auth/refresh", { body: { token } })
+        .then((response) => {
+          if (!response.data?.accessToken) {
+            throw new Error("No access token in response");
+          }
+          return response.data.accessToken;
+        })
+        .then((newToken) => {
+          login(newToken);
+          return newToken;
+        })
+        .catch((error) => {
+          console.error("Refresh token failed:", error);
+          logout();
+          return null;
+        })
+        .finally(() => {
+          refreshTokenPromise = null;
+        });
 
-      if (newToken) {
-        return newToken;
-      } else {
-        return null;
-      }
+      return refreshTokenPromise;
     }
 
     return token;
