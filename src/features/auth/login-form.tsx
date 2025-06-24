@@ -11,9 +11,10 @@ import { Input } from "@/shared/ui/kit/input";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { rqClient } from "@/shared/api/instance";
+import { publicRqClient } from "@/shared/api/instance";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/shared/model/routes";
+import { useSessionStore } from "@/shared/model/session";
 
 const loginSchema = z.object({
   email: z
@@ -31,19 +32,22 @@ const loginSchema = z.object({
 export function LoginForm() {
   const form = useForm({ resolver: zodResolver(loginSchema) });
 
+  const { login } = useSessionStore();
+
   const navigate = useNavigate();
 
-  const loginMutation = rqClient.useMutation("post", "/auth/login", {
-    onSuccess() {
+  const loginMutation = publicRqClient.useMutation("post", "/auth/login", {
+    onSuccess(data) {
+      login(data.accessToken);
       navigate(ROUTES.HOME);
     },
   });
 
-  const login = (data: { email: string; password: string }) => {
+  const handleLogin = (data: { email: string; password: string }) => {
     loginMutation.mutate({ body: data });
   };
 
-  const onSubmit = form.handleSubmit(login);
+  const onSubmit = form.handleSubmit(handleLogin);
 
   return (
     <Form {...form}>

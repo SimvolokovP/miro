@@ -11,9 +11,10 @@ import { Input } from "@/shared/ui/kit/input";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { rqClient } from "@/shared/api/instance";
+import { publicRqClient } from "@/shared/api/instance";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/shared/model/routes";
+import { useSessionStore } from "@/shared/model/session";
 
 const registerSchema = z
   .object({
@@ -37,10 +38,13 @@ const registerSchema = z
 export function RegisterForm() {
   const form = useForm({ resolver: zodResolver(registerSchema) });
 
+  const { login } = useSessionStore();
+
   const naviage = useNavigate();
 
-  const registerMutation = rqClient.useMutation("post", "/auth/register", {
-    onSuccess() {
+  const registerMutation = publicRqClient.useMutation("post", "/auth/register", {
+    onSuccess(data) {
+      login(data.accessToken);
       naviage(ROUTES.HOME);
     },
   });
