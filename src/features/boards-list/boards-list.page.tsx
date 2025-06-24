@@ -22,7 +22,7 @@ const BoardsList = () => {
 
   return (
     <div>
-      {res.data?.map((board) => (
+      {/* {res.data?.list.map((board) => (
         <Card key={board.id}>
           <CardHeader>
             <Button asChild variant={"link"}>
@@ -45,7 +45,7 @@ const BoardsList = () => {
             </Button>
           </CardFooter>
         </Card>
-      ))}
+      ))} */}
     </div>
   );
 };
