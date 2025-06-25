@@ -9,15 +9,15 @@ import { viewMode, ViewModeToggle } from "./ui/view-mode-toggle";
 
 import { BoardsSidebar } from "./ui/boards-sidebar";
 import { useBoardsList } from "./models/use-boards-list";
-import { BoardsListItem } from "./ui/boards-list-item";
-import { BoardsListCard } from "./ui/boards-list-card";
+import { BoardItem } from "./compose/board-item";
+import { BoardCard } from "./compose/board-card";
 
 function BoardsListPage() {
   const boardsQuery = useBoardsList({
     isFavorite: true,
   });
 
-  const [viewMode, setViewMode] = useState<viewMode>("list");
+  const [viewMode, setViewMode] = useState<viewMode>("cards");
 
   return (
     <BoardsListLayout
@@ -44,12 +44,12 @@ function BoardsListPage() {
         mode={viewMode}
         renderList={() =>
           boardsQuery.boards.map((board) => (
-            <BoardsListItem key={board.id} board={board} />
+            <BoardItem key={board.id} board={board} />
           ))
         }
         renderGrid={() =>
           boardsQuery.boards.map((board) => (
-            <BoardsListCard key={board.id} board={board} />
+            <BoardCard key={board.id} board={board} />
           ))
         }
       />

@@ -1,13 +1,15 @@
-import { useState } from "react";
-
 import {
   BoardsListLayout,
   BoardsListLayoutHeader,
 } from "./ui/boards-list-layout";
 
 import { BoardsSidebar } from "./ui/boards-sidebar";
+import { Button } from "@/shared/ui/kit/button";
+import { useCreateBoard } from "./models/use-create-board";
 
 function BoardsListCreatePage() {
+  const { create, isPending } = useCreateBoard();
+
   return (
     <BoardsListLayout
       sidebar={<BoardsSidebar />}
@@ -18,7 +20,9 @@ function BoardsListCreatePage() {
         />
       }
     >
-      <div>Создать</div>
+      <Button className="max-w-[128px]" onClick={create} disabled={isPending}>
+        Создать
+      </Button>
     </BoardsListLayout>
   );
 }
