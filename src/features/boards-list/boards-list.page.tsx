@@ -1,71 +1,94 @@
-import { ROUTES } from "@/shared/model/routes";
-import { Button } from "@/shared/ui/kit/button";
-import { Card, CardFooter, CardHeader } from "@/shared/ui/kit/card";
-import { href, Link } from "react-router-dom";
 import { useBoardsList } from "./models/use-boards-list";
+import { useBoardsFilters } from "./models/use-boards-filters";
+
+import { useDebouncedValue } from "@/shared/lib/react";
+
+import { useState } from "react";
+import { viewMode, ViewModeToggle } from "./ui/view-mode-toggle";
 import {
-  BoardsSortOption,
-  useBoardsFilters,
-} from "./models/use-boards-filters";
-import { Label } from "@/shared/ui/kit/label";
-import { Select } from "@/shared/ui/kit/select";
-import {
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@radix-ui/react-select";
+  BoardsListLayout,
+  BoardsListLayoutContent,
+  BoardsListLayoutFilters,
+  BoardsListLayoutHeader,
+} from "./ui/boards-list-layout";
+import { Button } from "@/shared/ui/kit/button";
+import { PlusIcon } from "lucide-react";
+import { BoardsSidebar } from "./ui/boards-sidebar";
+import BoardsSelect from "./ui/boards-select";
+import { BoardsInput } from "./ui/boards-input";
+import { BoardsListItem } from "./ui/boards-list-item";
+import { BoardsListCard } from "./ui/boards-list-card";
 
 const BoardsList = () => {
   const boardFilters = useBoardsFilters();
   const boardListQuery = useBoardsList({
     sort: boardFilters.sort,
-    search: boardFilters.search,
+    search: useDebouncedValue(boardFilters.search, 300),
   });
 
-  return (
-    <div>
-      <div className="flex flex-col">
-        <Label htmlFor="sort">Сортировка</Label>
-        <Select
-          value={boardFilters.sort}
-          onValueChange={(v) => boardFilters.setSort(v as BoardsSortOption)}
-        >
-          <SelectTrigger id="sort" className="w-full">
-            <SelectValue placeholder="Сортировка" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="lastOpenedAt">По дате открытия</SelectItem>
-            <SelectItem value="createdAt">По дате создания</SelectItem>
-            <SelectItem value="updatedAt">По дате обновления</SelectItem>
-            <SelectItem value="name">По имени</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+  const [viewMode, setViewMode] = useState<viewMode>("cards");
 
-      {boardListQuery.isPending ? (
-        <div>Load</div>
-      ) : (
-        boardListQuery.boards.map((board) => (
-          <Card key={board.id}>
-            <CardHeader>
-              <Button asChild variant={"link"}>
-                <Link to={href(ROUTES.BOARD, { boardId: board.id })}>
-                  {board.name}
-                </Link>
-              </Button>
-            </CardHeader>
-            <CardFooter></CardFooter>
-          </Card>
-        ))
-      )}
-      {boardListQuery.boards.length === 0 && <div>Not found</div>}
-      {boardListQuery.hasNextPage && (
-        <div ref={boardListQuery.cursorRef}>
-          {boardListQuery.isFetchingNextPage && <div>Load more..</div>}
-        </div>
-      )}
-    </div>
+  return (
+    <>
+      <BoardsListLayout
+        filters={
+          <BoardsListLayoutFilters
+            sort={
+              <BoardsSelect
+                value={boardFilters.sort}
+                onValueChange={boardFilters.setSort}
+              />
+            }
+            filters={
+              <BoardsInput
+                value={boardFilters.search}
+                onValueChange={boardFilters.setSearch}
+              />
+            }
+            actions={
+              <ViewModeToggle
+                value={viewMode}
+                onChange={(value) => setViewMode(value)}
+              />
+            }
+          />
+        }
+        header={
+          <BoardsListLayoutHeader
+            title="Доски"
+            description="Здесь вы можете просматривать и управлять своими досками"
+            actions={
+              <>
+                <Button>
+                  <PlusIcon />
+                  Создать доску
+                </Button>
+              </>
+            }
+          />
+        }
+        sidebar={<BoardsSidebar />}
+      >
+        <BoardsListLayoutContent
+          isEmpty={boardListQuery.boards.length === 0}
+          isPending={boardListQuery.isPending}
+          isPendingNext={boardListQuery.isFetchingNextPage}
+          cursorRef={boardListQuery.cursorRef}
+          hasCursor={boardListQuery.hasNextPage}
+          mode={viewMode}
+          renderList={() =>
+            boardListQuery.boards.map((board) => (
+              <BoardsListItem key={board.id} board={board} />
+            ))
+          }
+          renderGrid={() =>
+            boardListQuery.boards.map((board) => (
+              <BoardsListCard key={board.id} board={board} />
+            ))
+          }
+        />
+      </BoardsListLayout>
+    </>
   );
 };
 
