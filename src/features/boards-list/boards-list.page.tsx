@@ -18,6 +18,8 @@ import BoardsSelect from "./ui/boards-select";
 import { BoardsInput } from "./ui/boards-input";
 import { BoardsListItem } from "./ui/boards-list-item";
 import { BoardsListCard } from "./ui/boards-list-card";
+import { Link } from "react-router-dom";
+import { ROUTES } from "@/shared/model/routes";
 
 const BoardsList = () => {
   const boardFilters = useBoardsFilters();
@@ -59,9 +61,11 @@ const BoardsList = () => {
             description="Здесь вы можете просматривать и управлять своими досками"
             actions={
               <>
-                <Button>
-                  <PlusIcon />
-                  Создать доску
+                <Button asChild>
+                  <Link to={ROUTES.CREATE_BOARDS}>
+                    <PlusIcon />
+                    Создать доску
+                  </Link>
                 </Button>
               </>
             }

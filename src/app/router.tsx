@@ -21,9 +21,9 @@ export const router = createBrowserRouter([
               import("@/features/boards-list/boards-list-favorite.page"),
           },
           {
-            path: ROUTES.RECENT_BOARDS,
+            path: ROUTES.CREATE_BOARDS,
             lazy: () =>
-              import("@/features/boards-list/boards-list-recent.page"),
+              import("@/features/boards-list/boards-list-create.page"),
           },
 
           {

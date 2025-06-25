@@ -1,7 +1,7 @@
 import { ROUTES } from "@/shared/model/routes";
 import { Button } from "@/shared/ui/kit/button";
 import { Link } from "react-router-dom";
-import { LayoutGridIcon, StarIcon, ClockIcon } from "lucide-react";
+import { LayoutGridIcon, StarIcon, CreativeCommons } from "lucide-react";
 import { cn } from "@/shared/lib/css";
 
 interface BoardsSidebarProps {
@@ -26,9 +26,9 @@ export function BoardsSidebar({ className }: BoardsSidebarProps) {
           </Link>
         </Button>
         <Button variant="ghost" className="w-full justify-start" asChild>
-          <Link to={ROUTES.RECENT_BOARDS}>
-            <ClockIcon className="mr-2 h-4 w-4" />
-            Недавние
+          <Link to={ROUTES.CREATE_BOARDS}>
+            <CreativeCommons className="mr-2 h-4 w-4" />
+            Создать доску
           </Link>
         </Button>
       </div>
